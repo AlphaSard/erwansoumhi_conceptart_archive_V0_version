@@ -5,13 +5,10 @@ import Link from "next/link";
 
 export default async function Page() {
 	const items = await getProjects();
-
 	return (
 		<main className="max-w-3xl mx-auto p-6 space-y-6">
 			<h1 className="text-2xl font-semibold">Projects</h1>
-
 			<div className="text-sm opacity-70">items.length = {items.length}</div>
-
 			{items.length === 0 ? (
 				<p>Aucun projet.</p>
 			) : (
@@ -24,12 +21,6 @@ export default async function Page() {
 							>
 								{p.title ?? p.slug}
 							</Link>
-							{p.tags?.length ? (
-								<div className="mt-2 text-sm">
-									Tags: {p.tags.map((t: any) => t.name).join(", ")}
-								</div>
-							) : null}
-							{p.excerpt ? <p className="mt-2">{p.excerpt}</p> : null}
 						</li>
 					))}
 				</ul>
