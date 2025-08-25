@@ -1,14 +1,17 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
-}
+const config = {
+	images: {
+		remotePatterns: [
+			{
+				protocol: "http",
+				hostname: "localhost",
+				port: "1337",
+				pathname: "/uploads/**",
+			},
+			// Ajoute ceci quand tu passeras sur Strapi Cloud :
+			// { protocol: "https", hostname: "<ton-domaine-strapi-cloud>", pathname: "/uploads/**" },
+		],
+	},
+};
 
-export default nextConfig
+export default config;
