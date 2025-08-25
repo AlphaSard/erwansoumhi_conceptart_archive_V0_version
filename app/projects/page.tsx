@@ -1,16 +1,39 @@
-import { api } from "@/lib/strapi";
+export const revalidate = 60;
 
-export const dynamic = "force-dynamic"; // évite la SSG qui casse au build
+import { getProjects } from "@/lib/strapi";
+import Link from "next/link";
+
 export default async function Page() {
-	const data = await api<{ data: any[] }>(
-		"/api/projects?pagination[pageSize]=24",
-	);
-	const items = data?.data ?? [];
+	const items = await getProjects();
+
 	return (
-		<main className="p-6 grid gap-4">
-			{items.map((p) => (
-				<div key={p.id}>{p.attributes?.title}</div>
-			))}
+		<main className="max-w-3xl mx-auto p-6 space-y-6">
+			<h1 className="text-2xl font-semibold">Projects</h1>
+
+			<div className="text-sm opacity-70">items.length = {items.length}</div>
+
+			{items.length === 0 ? (
+				<p>Aucun projet.</p>
+			) : (
+				<ul className="space-y-4">
+					{items.map((p: any) => (
+						<li key={p.id} className="border rounded-xl p-4">
+							<Link
+								href={`/projects/${p.slug}`}
+								className="text-lg font-medium underline"
+							>
+								{p.title ?? p.slug}
+							</Link>
+							{p.tags?.length ? (
+								<div className="mt-2 text-sm">
+									Tags: {p.tags.map((t: any) => t.name).join(", ")}
+								</div>
+							) : null}
+							{p.excerpt ? <p className="mt-2">{p.excerpt}</p> : null}
+						</li>
+					))}
+				</ul>
+			)}
 		</main>
 	);
 }

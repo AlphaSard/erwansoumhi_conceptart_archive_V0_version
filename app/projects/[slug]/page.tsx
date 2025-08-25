@@ -1,29 +1,36 @@
-import { api } from "@/lib/strapi";
-import { notFound } from "next/navigation";
 export const revalidate = 60;
 
-export default async function Page({
-	params,
-}: {
-	params: Promise<{ slug: string }>;
-}) {
-	const { slug } = await params;
+import { getAllProjectSlugs, getProjectBySlug } from "@/lib/strapi";
+import { notFound } from "next/navigation";
 
-	const data = await api<{
-		data: {
-			id: number;
-			attributes: { title: string; slug: string; excerpt?: string };
-		}[];
-	}>(`/api/projects?filters[slug][$eq]=${slug}&populate[tags]=true`);
+export async function generateStaticParams() {
+	const slugs = await getAllProjectSlugs();
+	return slugs.map((slug: string) => ({ slug }));
+}
 
-	const item = data?.data?.[0];
-	if (!item) return notFound();
+export default async function Page({ params }: { params: { slug: string } }) {
+	const item = await getProjectBySlug(params.slug);
+	if (!item) notFound();
 
-	const a = item.attributes;
 	return (
-		<main className="p-6">
-			<h1 className="text-3xl mb-4">{a.title}</h1>
-			{a.excerpt && <p className="opacity-80">{a.excerpt}</p>}
+		<main className="max-w-3xl mx-auto p-6 space-y-4">
+			<h1 className="text-3xl font-semibold">{item.title ?? item.slug}</h1>
+
+			<div className="text-sm opacity-70">
+				slug = {item.slug} · id = {item.id}
+			</div>
+
+			{item.tags?.length ? (
+				<div className="text-sm">
+					Tags: {item.tags.map((t: any) => t.name).join(", ")}
+				</div>
+			) : null}
+
+			{item.excerpt ? (
+				<p className="mt-4 leading-relaxed">{item.excerpt}</p>
+			) : (
+				<p className="mt-4">Pas d’excerpt.</p>
+			)}
 		</main>
 	);
 }
