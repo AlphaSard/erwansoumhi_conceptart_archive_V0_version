@@ -1,37 +1,32 @@
-import Link from "next/link"
-import Image from "next/image"
-import { notFound } from "next/navigation"
-import Navigation from "@/components/navigation"
-import { getProjectsByType } from "@/lib/projects"
+import Navigation from "@/components/navigation";
+import { getProjectsByType } from "@/lib/projects";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-const validTypes = ["video", "installation", "recherche", "performance", "photographie"]
+const validTypes = ["video", "installation", "recherche", "performance", "photographie"];
 
-interface FilterPageProps {
-  params: {
-    type: string
-  }
-}
-
-export default function FilterPage({ params }: FilterPageProps) {
-  if (!validTypes.includes(params.type)) {
-    notFound()
-  }
+export default async function FilterPage(
+  { params }: { params: Promise<{ type: string }> }
+) {
+  const { type } = await params;
+  if (!validTypes.includes(type)) notFound();
 
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
       <main className="pt-2.5">
         <div className="text-center py-8">
-          <h1 className="text-2xl font-light text-black capitalize">{params.type}</h1>
+          <h1 className="text-2xl font-light text-black capitalize">{type}</h1>
         </div>
-        <FilteredProjectGrid type={params.type} />
+        <FilteredProjectGrid type={type} />
       </main>
     </div>
-  )
+  );
 }
 
 function FilteredProjectGrid({ type }: { type: string }) {
-  const filteredProjects = getProjectsByType(type)
+  const filteredProjects = getProjectsByType(type);
 
   return (
     <div className="max-w-8xl mx-auto px-8 py-8">
@@ -51,11 +46,13 @@ function FilteredProjectGrid({ type }: { type: string }) {
             </Link>
             <p className="text-xs mt-2 text-center w-[200px] text-black">{project.title}</p>
             <Link href={`/filter/${project.type}`} className="block text-center">
-              <span className="text-xs text-gray-500 hover:text-gray-700 transition-colors">{project.type}</span>
+              <span className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
+                {project.type}
+              </span>
             </Link>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }

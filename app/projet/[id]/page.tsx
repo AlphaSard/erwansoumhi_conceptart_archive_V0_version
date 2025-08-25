@@ -1,25 +1,31 @@
-import { notFound } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { projects, getProjectById } from "@/lib/projects"
+// app/projet/[id]/page.tsx
+import { getProjectById, projects } from "@/lib/projects";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-export default function ProjectPage({ params }: { params: { id: string } }) {
-  const projectId = Number.parseInt(params.id)
-  const project = getProjectById(projectId)
+export const revalidate = 60;
+
+export default async function ProjectPage(
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const projectId = Number.parseInt(id, 10);
+  const project = getProjectById(projectId);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      {/* Project Title */}
       <h1 className="text-2xl font-light mb-2 text-center">{project.title}</h1>
+      {project.subtitle && (
+        <p className="text-sm text-gray-600 mb-8 text-center font-light">
+          {project.subtitle}
+        </p>
+      )}
 
-      {/* Project Subtitle */}
-      {project.subtitle && <p className="text-sm text-gray-600 mb-8 text-center font-light">{project.subtitle}</p>}
-
-      {/* Main Image */}
       <div className="mb-12">
         <Image
           src={project.image || "/placeholder.svg"}
@@ -30,7 +36,6 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         />
       </div>
 
-      {/* Project Details */}
       {(project.description || project.year || project.medium || project.dimensions) && (
         <div className="grid md:grid-cols-2 gap-12">
           {project.description && (
@@ -65,7 +70,6 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         </div>
       )}
 
-      {/* Additional Images Grid */}
       <div className="mt-16">
         <h2 className="text-lg font-light mb-8">Vues de l'œuvre</h2>
         <div className="grid md:grid-cols-2 gap-8">
@@ -86,7 +90,6 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      {/* Navigation to other projects */}
       <div className="mt-16 pt-8 border-t border-gray-200">
         <div className="flex justify-between items-center">
           {projectId > 1 && (
@@ -105,5 +108,5 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
