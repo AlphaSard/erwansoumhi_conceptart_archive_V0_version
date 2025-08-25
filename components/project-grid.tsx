@@ -1,6 +1,6 @@
-import { projects } from "@/lib/projects";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
+import { projects } from "@/lib/projects"
 
 export default function ProjectGrid() {
 	return (
@@ -34,5 +34,5 @@ export default function ProjectGrid() {
 				))}
 			</div>
 		</div>
-	);
+	)
 }

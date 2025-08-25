@@ -1,366 +1,366 @@
 {
-  "project": "Next.js + Strapi + SEO & AI-SEO",
-  "version": "1.0.0",
-  "phases": [
-    {
-      "id": "0",
-      "title": "Pré-requis techniques",
-      "why": "Assurer accès API et build stables.",
-      "tasks": [
-        {
-          "id": "0.1",
-          "text": "Configurer NEXT_PUBLIC_STRAPI_URL et REVALIDATE_SECRET sur Vercel",
-          "done": false
-        },
-        {
-          "id": "0.2",
-          "text": "Configurer CORS Strapi (prod + preview Vercel)",
-          "done": false
-        },
-        {
-          "id": "0.3",
-          "text": "Ouvrir permissions Public: site-settings.find, site-seo.find, project.find, project.findOne, tag.find",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "1",
-      "title": "Modèles Strapi",
-      "why": "Rendre contenu et SEO éditables via CMS.",
-      "tasks": [
-        {
-          "id": "1.1",
-          "text": "Créer Single Type site-settings (siteTitle, nav[], homeVideoEmbed)",
-          "done": false
-        },
-        {
-          "id": "1.2",
-          "text": "Créer Single Type site-seo (defaultTitle, defaultDescription, canonicalBase, openGraphImage, twitterHandle, organization, aiPolicy, verification)",
-          "done": false
-        },
-        {
-          "id": "1.3",
-          "text": "Créer Component seoMeta {title, description, noindex, canonicalPath, ogImage, jsonLd}",
-          "done": false
-        },
-        {
-          "id": "1.4",
-          "text": "Créer Collection tag {name, slug, seo(seoMeta)}",
-          "done": false
-        },
-        {
-          "id": "1.5",
-          "text": "Créer Collection project {title, slug, subtitle, excerpt, cover(media), tags(rel), blocks(DZ), seo(seoMeta)}",
-          "done": false
-        },
-        {
-          "id": "1.6",
-          "text": "Publier ≥ 3 projets complets (cover + tag)",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "2",
-      "title": "Data Layer (lib/strapi.ts)",
-      "why": "Centraliser le fetch, activer ISR.",
-      "tasks": [
-        {
-          "id": "2.1",
-          "text": "Implémenter getSiteSettings(), getSiteSeo()",
-          "done": false
-        },
-        {
-          "id": "2.2",
-          "text": "Implémenter getProjectsListGrid(), getProjectsByTagGrid(), getRelatedProjectsGrid()",
-          "done": false
-        },
-        {
-          "id": "2.3",
-          "text": "Implémenter getProjectBySlug(), getAllProjectSlugs()",
-          "done": false
-        },
-        {
-          "id": "2.4",
-          "text": "Normaliser URLs images (ABS) + populate/fields/sort/pagination + revalidate",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "3",
-      "title": "Layout global",
-      "why": "Cohérence visuelle et SEO par défaut.",
-      "tasks": [
-        {
-          "id": "3.1",
-          "text": "Rendre app/layout.tsx async et charger site-settings + site-seo",
-          "done": false
-        },
-        {
-          "id": "3.2",
-          "text": "Afficher siteTitle + nav",
-          "done": false
-        },
-        {
-          "id": "3.3",
-          "text": "Définir metadata par défaut via site-seo",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "4",
-      "title": "Home / Landing",
-      "why": "Accueil éditable et indexable.",
-      "tasks": [
-        {
-          "id": "4.1",
-          "text": "Afficher homeVideoEmbed dans app/page.tsx",
-          "done": false
-        },
-        {
-          "id": "4.2",
-          "text": "Injecter ProjectGrid",
-          "done": false
-        },
-        {
-          "id": "4.3",
-          "text": "Ajouter SEO (generateMetadata) + JSON-LD WebSite/Organization",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "5",
-      "title": "Grille Projet",
-      "why": "Composant unique réutilisable.",
-      "tasks": [
-        {
-          "id": "5.1",
-          "text": "Refactor components/project-grid.tsx pour consommer Strapi",
-          "done": false
-        },
-        {
-          "id": "5.2",
-          "text": "Ajouter props {variant, tagSlug, excludeSlug, limit}",
-          "done": false
-        },
-        {
-          "id": "5.3",
-          "text": "Corriger liens vers /projects/[slug] et /tags/[slug]",
-          "done": false
-        },
-        {
-          "id": "5.4",
-          "text": "Utiliser next/image + alt + sizes",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "6",
-      "title": "Page Projet",
-      "why": "Détail riche, maillage, SEO fort.",
-      "tasks": [
-        {
-          "id": "6.1",
-          "text": "generateStaticParams() via getAllProjectSlugs()",
-          "done": false
-        },
-        {
-          "id": "6.2",
-          "text": "Rendu blocks (richText, image, gallery, videoEmbed) + tags + cover",
-          "done": false
-        },
-        {
-          "id": "6.3",
-          "text": "Related: ProjectGrid variant=compact excludeSlug limit=10",
-          "done": false
-        },
-        {
-          "id": "6.4",
-          "text": "SEO generateMetadata depuis project.seo + site-seo",
-          "done": false
-        },
-        {
-          "id": "6.5",
-          "text": "JSON-LD CreativeWork (+ BreadcrumbList)",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "7",
-      "title": "Pages Tag",
-      "why": "Catégories indexables et utiles.",
-      "tasks": [
-        {
-          "id": "7.1",
-          "text": "Créer route /tags/[slug] + fetch tag + grid filtrée",
-          "done": false
-        },
-        {
-          "id": "7.2",
-          "text": "SEO generateMetadata + JSON-LD CollectionPage",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "8",
-      "title": "Revalidation ISR",
-      "why": "Contenu frais sans redeploy.",
-      "tasks": [
-        {
-          "id": "8.1",
-          "text": "Implémenter /api/revalidate (token + path)",
-          "done": false
-        },
-        {
-          "id": "8.2",
-          "text": "Configurer Webhook Strapi (publish/update) → reval paths clés",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "9",
-      "title": "SEO avancé (classique)",
-      "why": "Méta complètes, extraits riches.",
-      "tasks": [
-        {
-          "id": "9.1",
-          "text": "generateMetadata sur toutes pages (title, desc, canonical, robots, OG, Twitter)",
-          "done": false
-        },
-        {
-          "id": "9.2",
-          "text": "JSON-LD adaptés (WebSite, Organization, CreativeWork, CollectionPage, BreadcrumbList)",
-          "done": false
-        },
-        {
-          "id": "9.3",
-          "text": "Fallback OG/Twitter via site-seo.openGraphImage",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "10",
-      "title": "SEO pour IA (AI-SEO)",
-      "why": "Bots LLM lisent et exploitent le site.",
-      "tasks": [
-        {
-          "id": "10.1",
-          "text": "Créer routes /ai/site-manifest.json, /ai/knowledge.jsonl, /ai/faq.json, /ai/sources.xml",
-          "done": false
-        },
-        {
-          "id": "10.2",
-          "text": "Piloter aiPolicy et ai-faq via Strapi",
-          "done": false
-        },
-        {
-          "id": "10.3",
-          "text": "Autoriser /ai/* dans robots.txt",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "11",
-      "title": "Robots, Sitemaps, Canonicals",
-      "why": "Indexation propre et contrôlée.",
-      "tasks": [
-        {
-          "id": "11.1",
-          "text": "robots.txt clair (autoriser IA, bloquer previews)",
-          "done": false
-        },
-        {
-          "id": "11.2",
-          "text": "Sitemaps multiples (root, projects, tags, ai) avec lastmod/changefreq/priority",
-          "done": false
-        },
-        {
-          "id": "11.3",
-          "text": "Canonicals cohérents (siteSeo.canonicalBase + path)",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "12",
-      "title": "Observabilité & Debug",
-      "why": "Diagnostics rapides en prod.",
-      "tasks": [
-        {
-          "id": "12.1",
-          "text": "Conserver /api/debug-strapi (status, items, sample)",
-          "done": false
-        },
-        {
-          "id": "12.2",
-          "text": "Ajouter /api/health (versions, URLs)",
-          "done": false
-        },
-        {
-          "id": "12.3",
-          "text": "Ajouter /api/seo-check (présence meta/OG/JSON-LD)",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "13",
-      "title": "Accessibilité & Performance",
-      "why": "Meilleure UX + Core Web Vitals.",
-      "tasks": [
-        {
-          "id": "13.1",
-          "text": "Un h1 par page, hiérarchie h2/h3",
-          "done": false
-        },
-        {
-          "id": "13.2",
-          "text": "Alt descriptifs, focus visibles, contrastes",
-          "done": false
-        },
-        {
-          "id": "13.3",
-          "text": "Limiter CLS/LCP: images dimensionnées, vidéo lazy",
-          "done": false
-        }
-      ]
-    },
-    {
-      "id": "14",
-      "title": "Backlog futur",
-      "why": "Scalabilité et confort d’édition.",
-      "tasks": [
-        {
-          "id": "14.1",
-          "text": "Pagination / infinite scroll sur /projects",
-          "done": false
-        },
-        {
-          "id": "14.2",
-          "text": "Recherche interne (front, puis back)",
-          "done": false
-        },
-        {
-          "id": "14.3",
-          "text": "Preview drafts (mode brouillon Strapi)",
-          "done": false
-        },
-        {
-          "id": "14.4",
-          "text": "Pages invisibles calibrées IA (glossaires, timelines, notes)",
-          "done": false
-        }
-      ]
-    }
-  ]
+	"project": "Next.js + Strapi + SEO & AI-SEO",
+	"version": "1.0.0",
+	"phases": [
+		{
+			"id": "0",
+			"title": "Pré-requis techniques",
+			"why": "Assurer accès API et build stables.",
+			"tasks": [
+				{
+					"id": "0.1",
+					"text": "Configurer NEXT_PUBLIC_STRAPI_URL et REVALIDATE_SECRET sur Vercel",
+					"done": false
+				},
+				{
+					"id": "0.2",
+					"text": "Configurer CORS Strapi (prod + preview Vercel)",
+					"done": false
+				},
+				{
+					"id": "0.3",
+					"text": "Ouvrir permissions Public: site-settings.find, site-seo.find, project.find, project.findOne, tag.find",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "1",
+			"title": "Modèles Strapi",
+			"why": "Rendre contenu et SEO éditables via CMS.",
+			"tasks": [
+				{
+					"id": "1.1",
+					"text": "Créer Single Type site-settings (siteTitle, nav[], homeVideoEmbed)",
+					"done": false
+				},
+				{
+					"id": "1.2",
+					"text": "Créer Single Type site-seo (defaultTitle, defaultDescription, canonicalBase, openGraphImage, twitterHandle, organization, aiPolicy, verification)",
+					"done": false
+				},
+				{
+					"id": "1.3",
+					"text": "Créer Component seoMeta {title, description, noindex, canonicalPath, ogImage, jsonLd}",
+					"done": false
+				},
+				{
+					"id": "1.4",
+					"text": "Créer Collection tag {name, slug, seo(seoMeta)}",
+					"done": false
+				},
+				{
+					"id": "1.5",
+					"text": "Créer Collection project {title, slug, subtitle, excerpt, cover(media), tags(rel), blocks(DZ), seo(seoMeta)}",
+					"done": false
+				},
+				{
+					"id": "1.6",
+					"text": "Publier ≥ 3 projets complets (cover + tag)",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "2",
+			"title": "Data Layer (lib/strapi.ts)",
+			"why": "Centraliser le fetch, activer ISR.",
+			"tasks": [
+				{
+					"id": "2.1",
+					"text": "Implémenter getSiteSettings(), getSiteSeo()",
+					"done": false
+				},
+				{
+					"id": "2.2",
+					"text": "Implémenter getProjectsListGrid(), getProjectsByTagGrid(), getRelatedProjectsGrid()",
+					"done": false
+				},
+				{
+					"id": "2.3",
+					"text": "Implémenter getProjectBySlug(), getAllProjectSlugs()",
+					"done": false
+				},
+				{
+					"id": "2.4",
+					"text": "Normaliser URLs images (ABS) + populate/fields/sort/pagination + revalidate",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "3",
+			"title": "Layout global",
+			"why": "Cohérence visuelle et SEO par défaut.",
+			"tasks": [
+				{
+					"id": "3.1",
+					"text": "Rendre app/layout.tsx async et charger site-settings + site-seo",
+					"done": false
+				},
+				{
+					"id": "3.2",
+					"text": "Afficher siteTitle + nav",
+					"done": false
+				},
+				{
+					"id": "3.3",
+					"text": "Définir metadata par défaut via site-seo",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "4",
+			"title": "Home / Landing",
+			"why": "Accueil éditable et indexable.",
+			"tasks": [
+				{
+					"id": "4.1",
+					"text": "Afficher homeVideoEmbed dans app/page.tsx",
+					"done": false
+				},
+				{
+					"id": "4.2",
+					"text": "Injecter ProjectGrid",
+					"done": false
+				},
+				{
+					"id": "4.3",
+					"text": "Ajouter SEO (generateMetadata) + JSON-LD WebSite/Organization",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "5",
+			"title": "Grille Projet",
+			"why": "Composant unique réutilisable.",
+			"tasks": [
+				{
+					"id": "5.1",
+					"text": "Refactor components/project-grid.tsx pour consommer Strapi",
+					"done": false
+				},
+				{
+					"id": "5.2",
+					"text": "Ajouter props {variant, tagSlug, excludeSlug, limit}",
+					"done": false
+				},
+				{
+					"id": "5.3",
+					"text": "Corriger liens vers /projects/[slug] et /tags/[slug]",
+					"done": false
+				},
+				{
+					"id": "5.4",
+					"text": "Utiliser next/image + alt + sizes",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "6",
+			"title": "Page Projet",
+			"why": "Détail riche, maillage, SEO fort.",
+			"tasks": [
+				{
+					"id": "6.1",
+					"text": "generateStaticParams() via getAllProjectSlugs()",
+					"done": false
+				},
+				{
+					"id": "6.2",
+					"text": "Rendu blocks (richText, image, gallery, videoEmbed) + tags + cover",
+					"done": false
+				},
+				{
+					"id": "6.3",
+					"text": "Related: ProjectGrid variant=compact excludeSlug limit=10",
+					"done": false
+				},
+				{
+					"id": "6.4",
+					"text": "SEO generateMetadata depuis project.seo + site-seo",
+					"done": false
+				},
+				{
+					"id": "6.5",
+					"text": "JSON-LD CreativeWork (+ BreadcrumbList)",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "7",
+			"title": "Pages Tag",
+			"why": "Catégories indexables et utiles.",
+			"tasks": [
+				{
+					"id": "7.1",
+					"text": "Créer route /tags/[slug] + fetch tag + grid filtrée",
+					"done": false
+				},
+				{
+					"id": "7.2",
+					"text": "SEO generateMetadata + JSON-LD CollectionPage",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "8",
+			"title": "Revalidation ISR",
+			"why": "Contenu frais sans redeploy.",
+			"tasks": [
+				{
+					"id": "8.1",
+					"text": "Implémenter /api/revalidate (token + path)",
+					"done": false
+				},
+				{
+					"id": "8.2",
+					"text": "Configurer Webhook Strapi (publish/update) → reval paths clés",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "9",
+			"title": "SEO avancé (classique)",
+			"why": "Méta complètes, extraits riches.",
+			"tasks": [
+				{
+					"id": "9.1",
+					"text": "generateMetadata sur toutes pages (title, desc, canonical, robots, OG, Twitter)",
+					"done": false
+				},
+				{
+					"id": "9.2",
+					"text": "JSON-LD adaptés (WebSite, Organization, CreativeWork, CollectionPage, BreadcrumbList)",
+					"done": false
+				},
+				{
+					"id": "9.3",
+					"text": "Fallback OG/Twitter via site-seo.openGraphImage",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "10",
+			"title": "SEO pour IA (AI-SEO)",
+			"why": "Bots LLM lisent et exploitent le site.",
+			"tasks": [
+				{
+					"id": "10.1",
+					"text": "Créer routes /ai/site-manifest.json, /ai/knowledge.jsonl, /ai/faq.json, /ai/sources.xml",
+					"done": false
+				},
+				{
+					"id": "10.2",
+					"text": "Piloter aiPolicy et ai-faq via Strapi",
+					"done": false
+				},
+				{
+					"id": "10.3",
+					"text": "Autoriser /ai/* dans robots.txt",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "11",
+			"title": "Robots, Sitemaps, Canonicals",
+			"why": "Indexation propre et contrôlée.",
+			"tasks": [
+				{
+					"id": "11.1",
+					"text": "robots.txt clair (autoriser IA, bloquer previews)",
+					"done": false
+				},
+				{
+					"id": "11.2",
+					"text": "Sitemaps multiples (root, projects, tags, ai) avec lastmod/changefreq/priority",
+					"done": false
+				},
+				{
+					"id": "11.3",
+					"text": "Canonicals cohérents (siteSeo.canonicalBase + path)",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "12",
+			"title": "Observabilité & Debug",
+			"why": "Diagnostics rapides en prod.",
+			"tasks": [
+				{
+					"id": "12.1",
+					"text": "Conserver /api/debug-strapi (status, items, sample)",
+					"done": false
+				},
+				{
+					"id": "12.2",
+					"text": "Ajouter /api/health (versions, URLs)",
+					"done": false
+				},
+				{
+					"id": "12.3",
+					"text": "Ajouter /api/seo-check (présence meta/OG/JSON-LD)",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "13",
+			"title": "Accessibilité & Performance",
+			"why": "Meilleure UX + Core Web Vitals.",
+			"tasks": [
+				{
+					"id": "13.1",
+					"text": "Un h1 par page, hiérarchie h2/h3",
+					"done": false
+				},
+				{
+					"id": "13.2",
+					"text": "Alt descriptifs, focus visibles, contrastes",
+					"done": false
+				},
+				{
+					"id": "13.3",
+					"text": "Limiter CLS/LCP: images dimensionnées, vidéo lazy",
+					"done": false
+				}
+			]
+		},
+		{
+			"id": "14",
+			"title": "Backlog futur",
+			"why": "Scalabilité et confort d’édition.",
+			"tasks": [
+				{
+					"id": "14.1",
+					"text": "Pagination / infinite scroll sur /projects",
+					"done": false
+				},
+				{
+					"id": "14.2",
+					"text": "Recherche interne (front, puis back)",
+					"done": false
+				},
+				{
+					"id": "14.3",
+					"text": "Preview drafts (mode brouillon Strapi)",
+					"done": false
+				},
+				{
+					"id": "14.4",
+					"text": "Pages invisibles calibrées IA (glossaires, timelines, notes)",
+					"done": false
+				}
+			]
+		}
+	]
 }

@@ -1,23 +1,25 @@
-import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
+import { revalidatePath, revalidateTag } from "next/cache"
+
+type RevalidatePayload = {
+	secret?: string
+	tag?: string
+	path?: string
+}
 
 export async function POST(req: Request) {
-	const secret = process.env.REVALIDATE_SECRET;
-	if (!secret || req.headers.get("x-revalidate-secret") !== secret) {
-		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-	}
-
-	let body: any = null;
+	let body: RevalidatePayload | null = null
 	try {
-		body = await req.json();
+		body = (await req.json()) as RevalidatePayload
 	} catch {
-		return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+		body = null
 	}
 
-	if (!body?.path) {
-		return NextResponse.json({ error: "Bad Request" }, { status: 400 });
+	if (!body?.secret || body.secret !== process.env.REVALIDATE_SECRET) {
+		return new Response("Invalid token", { status: 401 })
 	}
 
-	revalidatePath(body.path);
-	return NextResponse.json({ revalidated: true, path: body.path });
+	if (body.tag) revalidateTag(body.tag)
+	if (body.path) revalidatePath(body.path)
+
+	return new Response("ok", { status: 200 })
 }

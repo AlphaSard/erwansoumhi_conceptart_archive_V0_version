@@ -12,6 +12,6 @@ const config = {
 			// { protocol: "https", hostname: "<ton-domaine-strapi-cloud>", pathname: "/uploads/**" },
 		],
 	},
-};
+}
 
-export default config;
+export default config
