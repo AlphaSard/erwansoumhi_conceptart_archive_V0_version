@@ -1,37 +1,28 @@
-// app/projects/page.tsx
+import { api } from "@/lib/strapi";
 export const revalidate = 60;
 
-type Project = { id: number; title: string; slug: string };
-
-async function getProjects(): Promise<Project[]> {
-	const base = process.env.STRAPI_URL!;
-	const token = process.env.STRAPI_TOKEN!;
-	const url = `${base}/api/projects?pagination[pageSize]=10&populate[tags]=true`;
-
-	const res = await fetch(url, {
-		headers: { Authorization: `Bearer ${token}` },
-		next: { tags: ["projects"] },
-	});
-	if (!res.ok) throw new Error(`Strapi ${res.status}`);
-
-	const json = await res.json();
-	return json.data as Project[];
-}
+type StrapiList<T> = { data: { id: number; attributes: T }[] };
+type Project = { title: string; slug: string; excerpt?: string };
 
 export default async function Page() {
-	const projects = await getProjects();
-
+	const data = await api<StrapiList<Project>>(
+		"/api/projects?pagination[pageSize]=24&populate[tags]=true",
+	);
+	const items = data?.data ?? [];
 	return (
-		<main style={{ padding: 16 }}>
-			<h1>Projects</h1>
-
-			<ul>
-				{projects.map((p) => (
-					<li key={p.id}>
-						<a href={`/projects/${p.slug}`}>{p.title}</a>
-					</li>
-				))}
-			</ul>
+		<main className="p-6 grid gap-4 md:grid-cols-2">
+			{items.map((p) => (
+				<a
+					key={p.id}
+					href={`/projects/${p.attributes.slug}`}
+					className="block border p-4 rounded-xl"
+				>
+					<h2 className="text-xl">{p.attributes.title}</h2>
+					{p.attributes.excerpt && (
+						<p className="opacity-75">{p.attributes.excerpt}</p>
+					)}
+				</a>
+			))}
 		</main>
 	);
 }
