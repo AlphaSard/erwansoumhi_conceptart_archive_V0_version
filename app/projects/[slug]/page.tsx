@@ -2,15 +2,23 @@ import { api } from "@/lib/strapi";
 import { notFound } from "next/navigation";
 export const revalidate = 60;
 
-type StrapiList<T> = { data: { id: number; attributes: T }[] };
-type Project = { title: string; slug: string; excerpt?: string };
+export default async function Page({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}) {
+	const { slug } = await params;
 
-export default async function Page({ params }: { params: { slug: string } }) {
-	const data = await api<StrapiList<Project>>(
-		`/api/projects?filters[slug][$eq]=${params.slug}&populate[tags]=true`,
-	);
+	const data = await api<{
+		data: {
+			id: number;
+			attributes: { title: string; slug: string; excerpt?: string };
+		}[];
+	}>(`/api/projects?filters[slug][$eq]=${slug}&populate[tags]=true`);
+
 	const item = data?.data?.[0];
 	if (!item) return notFound();
+
 	const a = item.attributes;
 	return (
 		<main className="p-6">
