@@ -1,41 +1,37 @@
-import { getProjectBySlug, mediaUrl, type Project } from "@/lib/strapi";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
-type Props = { params: { slug: string } };
+async function getProject(slug: string) {
+	const base = process.env.STRAPI_URL!;
+	const token = process.env.STRAPI_TOKEN!;
+	const url = `${base}/api/projects?filters[slug][$eq]=${encodeURIComponent(
+		slug,
+	)}&populate[tags]=true`;
 
-export default async function Page({ params }: Props) {
-	const project: Project | null = await getProjectBySlug(params.slug);
-	if (!project) return notFound();
+	const res = await fetch(url, {
+		headers: { Authorization: `Bearer ${token}` },
+		next: { tags: [`project:${slug}`] },
+	});
+	if (!res.ok) throw new Error(`Strapi ${res.status}`);
+	const json = await res.json();
+	return json.data?.[0] ?? null;
+}
+
+export default async function Page({ params }: { params: { slug: string } }) {
+	const p = await getProject(params.slug);
+	if (!p) notFound();
 
 	return (
-		<main className="max-w-3xl mx-auto p-6 space-y-4">
-			<Link href="/projects" className="text-sm underline opacity-70">
-				← Projects
-			</Link>
-			<h1 className="text-3xl font-semibold">{project.title}</h1>
-			{project.excerpt && <p className="opacity-80">{project.excerpt}</p>}
-
-			{project.cover?.url && (
-				<div className="mt-4">
-					<Image
-						src={mediaUrl(project.cover.url)}
-						alt={project.cover.alternativeText || project.title}
-						width={1200}
-						height={675}
-						className="rounded-lg"
-					/>
-				</div>
-			)}
-
-			{project.tags?.length ? (
-				<p className="text-sm opacity-70">
-					Tags: {project.tags.map((t) => t.name).join(", ")}
-				</p>
-			) : null}
+		<main style={{ padding: 16 }}>
+			<h1>{p.title}</h1>
+			<p>Slug: {p.slug}</p>
+			<h2>Tags</h2>
+			<ul>
+				{p.tags?.map((t: any) => (
+					<li key={t.id}>{t.name}</li>
+				))}
+			</ul>
 		</main>
 	);
 }
