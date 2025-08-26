@@ -1,4 +1,4 @@
-// ==== Types exportés (⚠️ indispensables pour les imports "type ProjectItem") ====
+// ==== Types exportés ====
 export type Tag = {
 	id: number | string
 	name: string
@@ -13,10 +13,14 @@ export type ProjectItem = {
 	tags?: Tag[]
 }
 
-// ==== Base URL Strapi ====
+// ==== Config Strapi ====
 const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL ?? "http://localhost:1337"
+const publicationState =
+	(process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE as "live" | "preview") ??
+	"live"
+
 if (!baseUrl || baseUrl === "undefined") {
-	console.warn("⚠️ NEXT_PUBLIC_STRAPI_URL is missing. Using fallback localhost.")
+	console.warn("⚠️ NEXT_PUBLIC_STRAPI_URL missing. Using fallback localhost.")
 }
 
 // ==== Safe fetch (évite de casser le build) ====
@@ -61,27 +65,25 @@ function mapProject(item: any): ProjectItem | null {
 
 // ==== API ====
 export async function getProjects(): Promise<ProjectItem[]> {
-	const data = await safeJson<any>(`${baseUrl}/api/projects?populate=tags`, {
-		next: { revalidate: 60 },
-	})
+	const url = `${baseUrl}/api/projects?populate=tags&publicationState=${publicationState}`
+	const data = await safeJson<any>(url, { next: { revalidate: 60 } })
 	return (data?.data ?? []).map(mapProject).filter(Boolean) as ProjectItem[]
 }
 
 export async function getProjectBySlug(
 	slug: string,
 ): Promise<ProjectItem | null> {
-	const data = await safeJson<any>(
-		`${baseUrl}/api/projects?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=tags`,
-		{ next: { revalidate: 60 } },
-	)
+	const url = `${baseUrl}/api/projects?filters[slug][$eq]=${encodeURIComponent(
+		slug,
+	)}&populate=tags&publicationState=${publicationState}`
+	const data = await safeJson<any>(url, { next: { revalidate: 60 } })
 	const item = (data?.data ?? []).map(mapProject).filter(Boolean)[0] ?? null
 	return item
 }
 
 export async function getAllProjectSlugs(): Promise<string[]> {
-	const data = await safeJson<any>(`${baseUrl}/api/projects`, {
-		next: { revalidate: 300 },
-	})
+	const url = `${baseUrl}/api/projects?publicationState=${publicationState}`
+	const data = await safeJson<any>(url, { next: { revalidate: 300 } })
 	return (data?.data ?? [])
 		.map((it: any) => it?.attributes?.slug)
 		.filter((s: any): s is string => typeof s === "string" && s.length > 0)
