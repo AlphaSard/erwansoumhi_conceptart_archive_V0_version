@@ -12,14 +12,14 @@ type ProjectItem = {
 	tags?: Tag[]
 }
 
-export async function generateStaticParams() {
+// ✅ Typage explicite ajouté pour éviter toute ambiguïté
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
 	const slugs = await getAllProjectSlugs()
 	return slugs.map((slug: string) => ({ slug }))
 }
 
-type Props = { params: { slug: string } }
-
-export default async function Page({ params }: Props) {
+// ✅ Correction ici : plus de type Props séparé → typage inline direct
+export default async function Page({ params }: { params: { slug: string } }) {
 	const { slug } = params
 	const item: ProjectItem | null = await getProjectBySlug(slug)
 	if (!item) notFound()
@@ -45,3 +45,4 @@ export default async function Page({ params }: Props) {
 		</main>
 	)
 }
+// --- IGNORE ---
