@@ -1,6 +1,6 @@
 export const revalidate = 60
 
-import { getProjectBySlug, type ProjectItem } from "@/lib/strapi"
+import { getProjectBySlug, type ProjectItem } from "@/lib/strapi" // ← assure-toi que "type ProjectItem" est bien importé
 import { notFound } from "next/navigation"
 
 export default async function Page({ params }: any) {
