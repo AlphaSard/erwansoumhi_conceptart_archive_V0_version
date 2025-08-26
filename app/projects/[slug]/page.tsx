@@ -1,25 +1,9 @@
 export const revalidate = 60
 
+import { getProjectBySlug, type ProjectItem } from "@/lib/strapi"
 import { notFound } from "next/navigation"
-import { getAllProjectSlugs, getProjectBySlug } from "@/lib/strapi"
 
-type Tag = { name: string }
-type ProjectItem = {
-	id: string | number
-	slug: string
-	title?: string
-	excerpt?: string
-	tags?: Tag[]
-}
-
-// ✅ Typage explicite ajouté pour éviter toute ambiguïté
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
-	const slugs = await getAllProjectSlugs()
-	return slugs.map((slug: string) => ({ slug }))
-}
-
-// ✅ Correction ici : plus de type Props séparé → typage inline direct
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({ params }: any) {
 	const { slug } = params
 	const item: ProjectItem | null = await getProjectBySlug(slug)
 	if (!item) notFound()
@@ -30,13 +14,11 @@ export default async function Page({ params }: { params: { slug: string } }) {
 			<div className="text-sm opacity-70">
 				slug = {item.slug} · id = {item.id}
 			</div>
-
 			{item.tags?.length ? (
 				<div className="text-sm">
-					Tags: {item.tags.map((t: Tag) => t.name).join(", ")}
+					Tags: {item.tags.map((t) => t.name).join(", ")}
 				</div>
 			) : null}
-
 			{item.excerpt ? (
 				<p className="mt-4 leading-relaxed">{item.excerpt}</p>
 			) : (
@@ -45,4 +27,3 @@ export default async function Page({ params }: { params: { slug: string } }) {
 		</main>
 	)
 }
-// --- IGNORE ---

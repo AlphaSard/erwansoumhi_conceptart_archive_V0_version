@@ -8,8 +8,11 @@ const config = {
 				port: "1337",
 				pathname: "/uploads/**",
 			},
-			// Ajoute ceci quand tu passeras sur Strapi Cloud :
-			// { protocol: "https", hostname: "<ton-domaine-strapi-cloud>", pathname: "/uploads/**" },
+			{
+				protocol: "https",
+				hostname: "ton-strapi-cloud.vercel.app", // <-- mets ton vrai domaine Strapi
+				pathname: "/uploads/**",
+			},
 		],
 	},
 }
