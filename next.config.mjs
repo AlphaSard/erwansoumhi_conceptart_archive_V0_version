@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const config = {
+const nextConfig = {
 	images: {
 		remotePatterns: [
 			{
@@ -13,8 +13,13 @@ const config = {
 				hostname: "ton-strapi-cloud.vercel.app", // <-- mets ton vrai domaine Strapi
 				pathname: "/uploads/**",
 			},
+			{
+				protocol: "https",
+				hostname: "colorful-poem-606dab52fb.strapiapp.com",
+				pathname: "/uploads/**",
+			},
 		],
 	},
 }
 
-export default config
+export default nextConfig
