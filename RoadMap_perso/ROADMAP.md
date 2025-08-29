@@ -14,7 +14,6 @@
 **Pourquoi**: éviter 403/404 et garantir l’accès API en prod.
 
 ---
-
 ## Phase 1 — Modèles Strapi
 **Faire**
 - [ ] Single Type **site-settings**: `siteTitle`, `nav[] {label, href}`, `homeVideoEmbed`.
