@@ -1,21 +1,14 @@
 import { NextResponse } from "next/server";
-import { gridQuery } from "@/lib/projects-grid";
-
-export const runtime = "nodejs";
-export const preferredRegion = ["cdg1","fra1"];
-export const maxDuration = 60;
-
-export async function GET() {
-  const url = gridQuery(1).withSort;
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort("timeout"), 45000);
-  try {
-    const r = await fetch(url, { cache: "no-store", signal: ctrl.signal, headers: { Accept: "application/json" } });
-    const j = await r.json().catch(() => null);
-    return NextResponse.json({ status: r.status, url, len: Array.isArray(j?.data) ? j.data.length : 0 });
-  } catch (e:any) {
-    return NextResponse.json({ error: String(e), url }, { status: 500 });
-  } finally {
-    clearTimeout(timer);
-  }
+import { STRAPI_URL } from "@/lib/projects-grid";
+const u = new URL("/api/projects", STRAPI_URL);
+u.searchParams.set("pagination[pageSize]", "1");
+u.searchParams.set("populate[cover]", "*");
+u.searchParams.set("populate[tags]", "*");
+u.searchParams.append("sort[0]", "createdAt:desc");
+export async function GET(){
+  try{
+    const r = await fetch(u.toString(), { cache:"no-store", headers:{Accept:"application/json"} });
+    const t = await r.text(); let len=0; try{ const j=JSON.parse(t); len = Array.isArray(j?.data)? j.data.length:0; }catch{}
+    return NextResponse.json({ status:r.status, url:u.toString(), len, body:t.slice(0,200) });
+  }catch(e:any){ return NextResponse.json({ error:String(e), url:u.toString() }, { status:500 }); }
 }
