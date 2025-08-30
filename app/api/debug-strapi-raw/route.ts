@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { STRAPI_URL } from "@/lib/projects-grid";
+import { gridQuery } from "@/lib/projects-grid";
 
 export const runtime = "nodejs";
 export const preferredRegion = ["cdg1","fra1"];
 export const maxDuration = 60;
 
 export async function GET() {
-  const url = `${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=1&sort=createdAt:desc`;
+  const url = gridQuery(1).withSort;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort("timeout"), 45000);
   try {

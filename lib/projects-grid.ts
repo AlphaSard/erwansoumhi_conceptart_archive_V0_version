@@ -24,26 +24,28 @@ const mapProjectToCard = (p: Any): ProjectCard => {
 };
 
 export async function getProjectsListGrid(): Promise<ProjectCard[]> {
-  const state = process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE ? `&publicationState=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE!)}` : '';
-  const tryUrl = async (u: string) => {
+  const state = process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE
+    ? `&publicationState=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE!)}`
+    : '';
+  const base = `${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=50${state}`;
+  const withSort = `${base}&sort=createdAt:desc`;
+  const fetchMap = async (u: string) => {
     const r = await fetch(u, { cache: 'no-store' });
     if (!r.ok) throw new Error(`Strapi ${r.status}`);
     const j = await r.json();
     return (j?.data ?? []).map(mapProjectToCard);
   };
-  // Séquence: populate cover+tags + tri createdAt. Replis si 400.
-  try {
-    const u1 = `${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=50&sort=createdAt:desc${state}`;
-    return await tryUrl(u1);
-  } catch (e: any) {
-    if (String(e).includes('Strapi 400')) {
-      // Repli 1: populate=*
-      try { return await tryUrl(`${STRAPI_URL}/api/projects?populate=*&pagination[pageSize]=50&sort=createdAt:desc${state}`); } catch {}
-      // Repli 2: sans tri
-      try { return await tryUrl(`${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=50${state}`); } catch {}
-      // Repli 3: minimal
-      return await tryUrl(`${STRAPI_URL}/api/projects?pagination[pageSize]=50${state}`);
-    }
-    throw e;
-  }
+  try { return await fetchMap(withSort); }
+  catch (e: any) { if (String(e).includes('Strapi 400')) return await fetchMap(base); throw e; }
+}
+
+export function gridQuery(pageSize = 50) {
+  const state = process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE
+    ? `&publicationState=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE!)}`
+    : '';
+  const base = `${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=${pageSize}${state}`;
+  return {
+    withSort: `${base}&sort=createdAt:desc`,
+    withoutSort: base,
+  };
 }
