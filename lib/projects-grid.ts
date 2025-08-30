@@ -3,8 +3,20 @@ export const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? '').replace(/\/
 type Any = any;
 const attrs = <T>(e: Any): T => (e && e.attributes ? e.attributes : e);
 const abs   = (u?: string) => !u ? '' : u.startsWith('http') ? u : `${STRAPI_URL}${u}`;
-const media = (m:any) => { const d=m?.data; if (Array.isArray(d)) return d.length? abs(attrs<any>(d[0])?.url):""; return d? abs(attrs<any>(d)?.url):""; };
-const tagList = (t: Any) => ((t?.data ?? []) as Any[]).map(x => attrs<any>(x)?.slug ?? '').filter(Boolean);
+const media = (m: Any) => {
+  if (!m) return '';
+  if (typeof m === 'string') return abs(m);
+  if ((m as any).url) return abs((m as any).url); // v5 flat object
+  const d = (m as any)?.data; // legacy compat
+  if (Array.isArray(d)) return d.length ? abs(attrs<any>(d[0])?.url) : '';
+  return d ? abs(attrs<any>(d)?.url) : '';
+};
+const tagList = (t: Any) => {
+  const arr = Array.isArray(t) ? t : ((t?.data ?? []) as Any[]);
+  return arr
+    .map((x: any) => x?.slug ?? x?.attributes?.slug ?? x?.name ?? '')
+    .filter(Boolean);
+};
 
 function projectsUrlTrue(opts:{size?:number; keys?:string[]; sort?:boolean} = {}) {
   const { size=50, keys=['cover','tags'], sort=true } = opts;
@@ -29,8 +41,12 @@ const pickMedia = (a:any) =>
   media(a?.cover) || media(a?.image) || media(a?.thumbnail) || media(a?.featured_image) || "";
 
 const pickTags = (a:any) => {
-  const t = a?.tags ?? a?.tag ?? a?.categories ?? null;
-  return (t?.data ?? []).map((x:any) => (x?.attributes?.slug ?? x?.attributes?.name ?? "")).filter(Boolean);
+  const candidates = [a?.tags, a?.tag, a?.categories];
+  for (const t of candidates) {
+    const list = tagList(t);
+    if (list.length) return list;
+  }
+  return [] as string[];
 };
 
 const mapProjectToCard = (p: Any): ProjectCard => {
