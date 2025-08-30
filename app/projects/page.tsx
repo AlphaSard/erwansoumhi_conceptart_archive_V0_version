@@ -1,7 +1,7 @@
 import { getProjectsListGrid } from "@/lib/projects-grid";
 import ProjectGrid from "@/components/ProjectGrid";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function Page() {
   try {

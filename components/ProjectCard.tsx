@@ -1,18 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { ProjectCard as ProjectCardType } from "@/lib/projects-grid";
-import { media } from "@/lib/projects-grid";
+import type { Project } from "@/lib/types";
 
-export default function ProjectCard({ project }: { project: ProjectCardType }) {
-  const img = media((project as any)?.cover?.url ?? (project as any)?.cover);
+export default function ProjectCard({ project }: { project: Project }) {
+  const cover = project.cover;
+  const img = cover?.url ?? '';
+  const w = cover?.width ?? 1600;
+  const h = cover?.height ?? 900;
+  const alt = cover?.alt ?? project.title;
   return (
     <article className="rounded-2xl overflow-hidden border">
       <Link href={`/projects/${project.slug}`} className="block">
-        {img
-          ? <Image src={img} alt={project.title || "Projet"} width={1200} height={800}
-                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                   className="aspect-video object-cover" unoptimized />
-          : <div className="aspect-video bg-neutral-200" aria-hidden="true" />}
+        {img ? (
+          <>
+            <Image
+              src={img}
+              alt={alt}
+              width={w}
+              height={h}
+              sizes='(min-width:1024px) 33vw, 100vw'
+              className='w-full h-auto rounded-2xl object-cover'
+            />
+            
+          </>
+        ) : (
+          <div className='w-full aspect-[16/9] rounded-2xl bg-gray-200' aria-label='no cover' />
+        )}
         <div className="p-3">
           <h3 className="text-base font-medium line-clamp-2">{project.title}</h3>
           {project.tags?.length ? (

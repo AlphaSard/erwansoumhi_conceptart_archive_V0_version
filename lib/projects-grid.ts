@@ -1,22 +1,13 @@
-export const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? '').replace(/\/+$/, '');
+export const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? '').replace(/\/+$/, '')
+import type { Project } from '@/lib/types'
+import { normalizeCover } from '@/lib/normalize'
 
-type Any = any;
-const attrs = <T>(e: Any): T => (e && e.attributes ? e.attributes : e);
-const abs   = (u?: string) => !u ? '' : u.startsWith('http') ? u : `${STRAPI_URL}${u}`;
-export const media = (m: Any) => {
-  if (!m) return '';
-  if (typeof m === 'string') return abs(m);
-  if ((m as any).url) return abs((m as any).url); // v5 flat object
-  const d = (m as any)?.data; // legacy compat
-  if (Array.isArray(d)) return d.length ? abs(attrs<any>(d[0])?.url) : '';
-  return d ? abs(attrs<any>(d)?.url) : '';
-};
+type Any = any
+const attrs = <T>(e: Any): T => (e && e.attributes ? e.attributes : e)
 const tagList = (t: Any) => {
-  const arr = Array.isArray(t) ? t : ((t?.data ?? []) as Any[]);
-  return arr
-    .map((x: any) => x?.slug ?? x?.attributes?.slug ?? x?.name ?? '')
-    .filter(Boolean);
-};
+  const arr = Array.isArray(t) ? t : ((t?.data ?? []) as Any[])
+  return arr.map((x: any) => x?.slug ?? x?.attributes?.slug ?? x?.name ?? '').filter(Boolean)
+}
 
 function projectsUrlTrue(opts:{size?:number; keys?:string[]; sort?:boolean} = {}) {
   const { size=50, keys=['cover','tags'], sort=true } = opts;
@@ -35,11 +26,6 @@ function projectsUrlAll(size=50, sort=true) {
   return u.toString() + qsState();
 }
 
-export type ProjectCard = { id: number; slug: string; title: string; cover: string; tags: string[] };
-
-const pickMedia = (a:any) =>
-  media(a?.cover) || media(a?.image) || media(a?.thumbnail) || media(a?.featured_image) || "";
-
 const pickTags = (a:any) => {
   const candidates = [a?.tags, a?.tag, a?.categories];
   for (const t of candidates) {
@@ -49,16 +35,18 @@ const pickTags = (a:any) => {
   return [] as string[];
 };
 
-const mapProjectToCard = (p: Any): ProjectCard => {
-  const a = (p?.attributes ?? p) || {};
+const mapProject = (p: Any): Project | null => {
+  const a = (p?.attributes ?? p) || {}
+  const slug = a?.slug ?? ''
+  const title = a?.title ?? a?.name ?? ''
+  if (!slug || !title) return null
   return {
-    id: p?.id ?? a?.id ?? 0,
-    slug: a?.slug ?? '',
-    title: a?.title ?? a?.name ?? '',
-    cover: pickMedia(a),
+    slug,
+    title,
+    cover: normalizeCover(a?.cover) ?? normalizeCover(a?.image) ?? normalizeCover(a?.thumbnail) ?? null,
     tags: pickTags(a),
-  };
-};
+  }
+}
 
 function qsState() {
   return process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE
@@ -77,7 +65,7 @@ function projectsUrl({ size=50, populate=true, sort=true }:{size?:number;populat
   return u.toString() + qsState();
 }
 
-async function fetchMap(url: string) {
+async function fetchMap(url: string): Promise<Project[]> {
   const r = await fetch(url, { cache: 'no-store', headers: { Accept: 'application/json' } });
   if (!r.ok) {
     let body = '';
@@ -86,10 +74,10 @@ async function fetchMap(url: string) {
     throw new Error(msg);
   }
   const j = await r.json();
-  return (j?.data ?? []).map(mapProjectToCard);
+  return (j?.data ?? []).map(mapProject).filter(Boolean) as Project[]
 }
 
-export async function getProjectsListGrid(): Promise<ProjectCard[]> {
+export async function getProjectsListGrid(): Promise<Project[]> {
   const candidates = [
     projectsUrlTrue({ size:50, keys:['cover','tags'], sort:true }),
     projectsUrlTrue({ size:50, keys:['cover','tags'], sort:false }),
