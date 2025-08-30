@@ -102,3 +102,38 @@ export function gridQuery(pageSize = 50) {
     withoutSort: base,
   };
 }
+
+export async function getProjectsListGridPaged(searchParams: {
+  page?: number | string
+  pageSize?: number | string
+  tag?: string | null
+}): Promise<{ items: Project[]; meta: { page: number; pageSize: number; pageCount: number; total: number; tag: string | null } }> {
+  const base = process.env.NEXT_PUBLIC_STRAPI_URL!
+  const page = Math.max(1, parseInt(String(searchParams.page ?? '1'), 10) || 1)
+  const pageSize = Math.max(1, parseInt(String(searchParams.pageSize ?? '9'), 10) || 9)
+  const tag = (searchParams.tag ?? null) || null
+
+  const u = new URL('/api/projects', base)
+  u.searchParams.set('pagination[page]', String(page))
+  u.searchParams.set('pagination[pageSize]', String(pageSize))
+  u.searchParams.append('sort[0]', 'createdAt:desc')
+  u.searchParams.set('populate', 'cover,tags')
+  u.searchParams.set('locale', 'all')
+  if (tag) u.searchParams.set('filters[tags][name][$eq]', tag)
+
+  const r = await fetch(u.toString(), { next: { revalidate: 60 }, headers: { Accept: 'application/json' } })
+  if (!r.ok) return { items: [], meta: { page, pageSize, pageCount: 0, total: 0, tag } }
+  const j = await r.json()
+  const items: Project[] = (j?.data ?? []).map(mapProject).filter(Boolean) as Project[]
+  const meta = j?.meta?.pagination ?? { page, pageSize, pageCount: 0, total: items.length }
+  return {
+    items,
+    meta: {
+      page: Number(meta.page ?? page) || page,
+      pageSize: Number(meta.pageSize ?? pageSize) || pageSize,
+      pageCount: Number(meta.pageCount ?? 0) || 0,
+      total: Number(meta.total ?? items.length) || items.length,
+      tag,
+    },
+  }
+}
