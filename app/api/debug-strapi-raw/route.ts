@@ -6,7 +6,7 @@ export const preferredRegion = ["cdg1","fra1"];
 export const maxDuration = 60;
 
 export async function GET() {
-  const url = `${STRAPI_URL}/api/projects?pagination[pageSize]=1`;
+  const url = `${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=1&sort=createdAt:desc`;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort("timeout"), 45000);
   try {

@@ -3,7 +3,11 @@ export const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? '').replace(/\/
 type Any = any;
 const attrs = <T>(e: Any): T => (e && e.attributes ? e.attributes : e);
 const abs   = (u?: string) => !u ? '' : u.startsWith('http') ? u : `${STRAPI_URL}${u}`;
-const media = (m: Any) => (m && m.data ? abs(attrs<any>(m.data)?.url) : '');
+const media = (m: Any) => {
+  const d = m?.data;
+  if (Array.isArray(d)) return d.length ? abs(attrs<any>(d[0])?.url) : '';
+  return d ? abs(attrs<any>(d)?.url) : '';
+};
 const tagList = (t: Any) => ((t?.data ?? []) as Any[]).map(x => attrs<any>(x)?.slug ?? '').filter(Boolean);
 
 export type ProjectCard = { id: number; slug: string; title: string; cover: string; tags: string[] };
