@@ -3,7 +3,7 @@ export const STRAPI_URL = (process.env.NEXT_PUBLIC_STRAPI_URL ?? '').replace(/\/
 type Any = any;
 const attrs = <T>(e: Any): T => (e && e.attributes ? e.attributes : e);
 const abs   = (u?: string) => !u ? '' : u.startsWith('http') ? u : `${STRAPI_URL}${u}`;
-const media = (m: Any) => {
+export const media = (m: Any) => {
   if (!m) return '';
   if (typeof m === 'string') return abs(m);
   if ((m as any).url) return abs((m as any).url); // v5 flat object
