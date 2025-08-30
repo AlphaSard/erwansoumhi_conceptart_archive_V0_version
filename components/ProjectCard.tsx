@@ -1,9 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ProjectCard as ProjectCardType } from "@/lib/projects-grid";
 import { media } from "@/lib/projects-grid";
 
 export default function ProjectCard({ project }: { project: ProjectCardType }) {
-  const img = media((project as any)?.cover?.url ?? (project as any)?.cover);
+  const { url, width, height, alternativeText } = (project as any)?.cover ?? {};
+  const img = media(url);
   // Server-side debug log
   // eslint-disable-next-line no-console
   console.log("[ProjectCard server] img:", img, "slug:", project.slug);
@@ -12,20 +14,14 @@ export default function ProjectCard({ project }: { project: ProjectCardType }) {
       <Link href={`/projects/${project.slug}`} className="block">
         {img ? (
           <>
-            <img
+            <Image
               src={img}
-              alt={project.title || "Projet"}
-              width={1200}
-              height={675}
-              className="w-full h-auto rounded-2xl object-cover"
-              loading="lazy"
+              alt={alternativeText ?? project.title}
+              width={width ?? 1600}
+              height={height ?? 900}
+              sizes='(min-width:1024px) 33vw, 100vw'
+              className='w-full h-auto rounded-2xl object-cover'
             />
-            <span
-              data-test-cover-src={typeof img === "string" ? img : ""}
-              className="sr-only"
-            >
-              {img}
-            </span>
             {/* Client-side debug log */}
             <script
               // biome-ignore lint/security/noDangerouslySetInnerHtml: debug-only inline log
