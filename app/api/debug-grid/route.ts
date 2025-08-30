@@ -1,0 +1,11 @@
+import { NextResponse } from "next/server";
+import { getProjectsListGrid } from "@/lib/projects-grid";
+export async function GET() {
+  try {
+    const items = await getProjectsListGrid();
+    return NextResponse.json({ count: items.length, sample: items[0] ?? null });
+  } catch (e:any) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
+}
+
