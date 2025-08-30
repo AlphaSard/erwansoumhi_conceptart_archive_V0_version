@@ -20,11 +20,33 @@ const mapProjectToCard = (p: Any): ProjectCard => {
 };
 
 export async function getProjectsListGrid(): Promise<ProjectCard[]> {
-  const state = process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE ? `&publicationState=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE!)}` : '';
-  const url = `${STRAPI_URL}/api/projects?populate[cover]=*&populate[tags]=*&pagination[pageSize]=50&sort[0]=publishedAt:desc${state}`;
-  const r = await fetch(url, { cache: 'no-store' });
-  if (!r.ok) throw new Error(`Strapi ${r.status}`);
-  const j = await r.json();
-  return (j?.data ?? []).map(mapProjectToCard);
+  const state = process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE
+    ? `&publicationState=${encodeURIComponent(process.env.NEXT_PUBLIC_STRAPI_PUBLICATION_STATE!)}`
+    : '';
+  const tryUrl = async (u: string) => {
+    const r = await fetch(u, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`Strapi ${r.status}`);
+    const j = await r.json();
+    return (j?.data ?? []).map(mapProjectToCard);
+  };
+  // Essaye plusieurs variantes Strapi v5 (populate/sort), avec replis sur 400
+  const bases = [
+    `${STRAPI_URL}/api/projects?populate=tags&pagination[pageSize]=50${state}`,
+    `${STRAPI_URL}/api/projects?pagination[pageSize]=50${state}`,
+  ];
+  const urls: string[] = [];
+  for (const b of bases) {
+    urls.push(`${b}&sort=createdAt:desc`);
+    urls.push(b);
+  }
+  let lastErr: any = null;
+  for (const u of urls) {
+    try {
+      return await tryUrl(u);
+    } catch (e: any) {
+      lastErr = e;
+      if (!String(e).includes('Strapi 400')) throw e;
+    }
+  }
+  throw lastErr ?? new Error('Strapi request failed');
 }
-
