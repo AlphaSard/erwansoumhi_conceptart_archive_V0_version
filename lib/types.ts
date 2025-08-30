@@ -1,9 +1,3 @@
-export type Tag = { name: string }
-export type Project = {
-	id: string | number
-	slug: string
-	title?: string
-	tags?: Tag[]
-}
-export type RevalidatePayload = { secret?: string }
-export type ProjectWithContent = Project & { content: string }
+export type Cover = { url: string; width?: number; height?: number; alt?: string };
+export type Project = { title: string; slug: string; cover?: Cover | null; tags: string[] };
+
