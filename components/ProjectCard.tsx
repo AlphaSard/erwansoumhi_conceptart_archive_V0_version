@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { ProjectCard as ProjectCardType } from "@/lib/projects-grid";
 import { media } from "@/lib/projects-grid";
@@ -13,14 +12,13 @@ export default function ProjectCard({ project }: { project: ProjectCardType }) {
       <Link href={`/projects/${project.slug}`} className="block">
         {img ? (
           <>
-            <Image
+            <img
               src={img}
               alt={project.title || "Projet"}
               width={1200}
-              height={800}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="aspect-video object-cover"
-              unoptimized
+              height={675}
+              className="w-full h-auto rounded-2xl object-cover"
+              loading="lazy"
             />
             <span
               data-test-cover-src={typeof img === "string" ? img : ""}
