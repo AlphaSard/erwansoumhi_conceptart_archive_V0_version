@@ -6,16 +6,41 @@ const abs   = (u?: string) => !u ? '' : u.startsWith('http') ? u : `${STRAPI_URL
 const media = (m:any) => { const d=m?.data; if (Array.isArray(d)) return d.length? abs(attrs<any>(d[0])?.url):""; return d? abs(attrs<any>(d)?.url):""; };
 const tagList = (t: Any) => ((t?.data ?? []) as Any[]).map(x => attrs<any>(x)?.slug ?? '').filter(Boolean);
 
+function projectsUrlTrue(opts:{size?:number; keys?:string[]; sort?:boolean} = {}) {
+  const { size=50, keys=['cover','tags'], sort=true } = opts;
+  const u = new URL("/api/projects", STRAPI_URL);
+  u.searchParams.set("pagination[pageSize]", String(size));
+  for (const k of keys) u.searchParams.set(`populate[${k}]`, "true");
+  if (sort) u.searchParams.append("sort[0]", "createdAt:desc");
+  return u.toString() + qsState();
+}
+
+function projectsUrlAll(size=50, sort=true) {
+  const u = new URL("/api/projects", STRAPI_URL);
+  u.searchParams.set("pagination[pageSize]", String(size));
+  u.searchParams.set("populate", "*");
+  if (sort) u.searchParams.append("sort[0]", "createdAt:desc");
+  return u.toString() + qsState();
+}
+
 export type ProjectCard = { id: number; slug: string; title: string; cover: string; tags: string[] };
 
+const pickMedia = (a:any) =>
+  media(a?.cover) || media(a?.image) || media(a?.thumbnail) || media(a?.featured_image) || "";
+
+const pickTags = (a:any) => {
+  const t = a?.tags ?? a?.tag ?? a?.categories ?? null;
+  return (t?.data ?? []).map((x:any) => (x?.attributes?.slug ?? x?.attributes?.name ?? "")).filter(Boolean);
+};
+
 const mapProjectToCard = (p: Any): ProjectCard => {
-  const a = attrs<any>(p);
+  const a = (p?.attributes ?? p) || {};
   return {
     id: p?.id ?? a?.id ?? 0,
     slug: a?.slug ?? '',
     title: a?.title ?? a?.name ?? '',
-    cover: media(a?.cover),
-    tags: tagList(a?.tags),
+    cover: pickMedia(a),
+    tags: pickTags(a),
   };
 };
 
@@ -50,10 +75,13 @@ async function fetchMap(url: string) {
 
 export async function getProjectsListGrid(): Promise<ProjectCard[]> {
   const candidates = [
-    projectsUrl({ size:50, populate:true,  sort:true  }),
-    projectsUrl({ size:50, populate:true,  sort:false }),
-    projectsUrl({ size:50, populate:false, sort:true  }),
-    projectsUrl({ size:50, populate:false, sort:false }),
+    projectsUrlTrue({ size:50, keys:['cover','tags'], sort:true }),
+    projectsUrlTrue({ size:50, keys:['cover','tags'], sort:false }),
+    projectsUrlTrue({ size:50, keys:['image','tags'], sort:true }),
+    projectsUrlTrue({ size:50, keys:['thumbnail','tags'], sort:true }),
+    projectsUrlAll(50, true),
+    projectsUrlAll(50, false),
+    new URL("/api/projects", STRAPI_URL).toString() + `?pagination[pageSize]=50${qsState()}`
   ];
   let err:any;
   for (const u of candidates){ try { return await fetchMap(u); } catch(e:any){ err=e; if(!String(e).includes("Strapi 400")) throw e; } }

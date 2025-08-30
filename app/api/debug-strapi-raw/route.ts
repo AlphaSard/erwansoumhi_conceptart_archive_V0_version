@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { STRAPI_URL } from "@/lib/projects-grid";
 const u = new URL("/api/projects", STRAPI_URL);
 u.searchParams.set("pagination[pageSize]", "1");
-u.searchParams.set("populate[cover]", "*");
-u.searchParams.set("populate[tags]", "*");
+u.searchParams.set("populate[cover]", "true");
+u.searchParams.set("populate[tags]", "true");
 u.searchParams.append("sort[0]", "createdAt:desc");
 export async function GET(){
   try{
