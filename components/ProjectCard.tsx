@@ -22,6 +22,12 @@ export default function ProjectCard({ project }: { project: ProjectCardType }) {
               className="aspect-video object-cover"
               unoptimized
             />
+            <span
+              data-test-cover-src={typeof img === "string" ? img : ""}
+              className="sr-only"
+            >
+              {img}
+            </span>
             {/* Client-side debug log */}
             <script
               // biome-ignore lint/security/noDangerouslySetInnerHtml: debug-only inline log
